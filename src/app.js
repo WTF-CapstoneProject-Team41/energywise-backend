@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth.routes');
 const energyAccountRoutes = require('./routes/energyAccount.routes');
+const energyPurchaseRoutes = require('./routes/energyPurchase.routes');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(helmet());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/energy-account', energyAccountRoutes);
+app.use('/api/energy-purchases', energyPurchaseRoutes);
 
 // const limiter = rateLimit({
 //   windowMs: 15 * 60 * 1000,
