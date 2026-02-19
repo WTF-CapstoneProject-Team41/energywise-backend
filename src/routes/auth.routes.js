@@ -5,6 +5,31 @@ const authControllers = require("../controllers/auth.controller");
 const { body } = require("express-validator");
 const validate = require("../middlewares/validate.middleware");
 
+/**
+ * @swagger
+ * /api/auth/signup:
+ *   post:
+ *     summary: Register new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Signup successful
+ */
+
+
 router.post(
   "/signup",
   [
@@ -23,6 +48,30 @@ router.post(
   authControllers.signup,
 );
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               identifier:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
+ */
+
 router.post(
   "/login",
   [
@@ -35,6 +84,20 @@ router.post(
   authControllers.login,
 );
 
+/**
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Get current authenticated user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Returns current user
+ *       401:
+ *         description: Unauthorized
+ */
 router.get('/me', authMiddleware, authControllers.me)
 
 module.exports = router;

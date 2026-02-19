@@ -5,6 +5,31 @@ const energyAccountController = require('../controllers/energyAccount.controller
 const {body} = require('express-validator');
 const validate = require('../middlewares/validate.middleware');
 
+/**
+ * @swagger
+ * /api/energy-account:
+ *   post:
+ *     summary: Create energy account
+ *     tags: [EnergyAccount]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               account_type:
+ *                 type: string
+ *                 enum: [HOME, BUSINESS]
+ *               meter_number:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Energy account created
+ */
+
 // Create a new energy account
 router.post('/', authMiddleware, [
     body('account_type')

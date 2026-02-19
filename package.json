@@ -12,7 +12,9 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.17.2",
     "sequelize": "^6.37.7",
-    "sequelize-cli": "^6.6.5"
+    "sequelize-cli": "^6.6.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "scripts": {
     "start": "node server.js",
