@@ -10,8 +10,8 @@ const options = {
         },
         servers: [
                 {
-                    url: 'http://localhost:5000',
-                    description: 'Development server'
+                    url: 'https://energywise-backend.onrender.com',
+                    description: 'Production server'
                 }
             ],
         components: {
