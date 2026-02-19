@@ -3,9 +3,16 @@ const energyAccountService = require('../services/energyAccount.service');
 const createEnergyAccount = async (req, res) => {
     try {
         const result = await energyAccountService.createEnergyAccount(req.user.id, req.body);
-        res.status(201).json(result);
+        return res.status(201).json({
+            success: true,
+            message: result.message,
+            data: result.account
+        });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({
+            success: false,
+            message: error.message
+        });
     }
 }
 
