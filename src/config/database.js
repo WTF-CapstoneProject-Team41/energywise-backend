@@ -7,7 +7,6 @@ const sequelize = new Sequelize(process.env.DATABASE_URL,{
 })
 // const config = require('./env');
 
-
 // const sequelize = new Sequelize(
 //   config.db.name,
 //   config.db.user,
