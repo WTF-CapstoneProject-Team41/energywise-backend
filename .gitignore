@@ -1,0 +1,42 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# Coverage
+coverage/
+
+# Sequelize CLI config (if generated locally)
+sequelize-meta.json
+# Optional: Ignore IDE-specific files
+.idea/ 
+*.suo
+*.ntvs*
+
+# md files
+modelAssociation.md
+apis.md
+finalModel.md
+folderStructure.md
+generateMigrations.md
+initializeProject.md
+

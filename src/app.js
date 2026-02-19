@@ -1,0 +1,30 @@
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const authRoutes = require('./routes/auth.routes');
+const energyAccountRoutes = require('./routes/energyAccount.routes');
+
+const app = express();
+
+// Middlewares
+app.use(express.json());
+app.use(cors());
+app.use(helmet());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/energy-account', energyAccountRoutes);
+
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100
+// });
+
+// app.use(limiter);
+
+// Test route
+app.get('/', (req, res) => {
+  res.json({ message: 'EnergyWise API Running' });
+});
+
+module.exports = app;
