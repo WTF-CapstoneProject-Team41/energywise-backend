@@ -7,6 +7,7 @@ const EnergyAccountModel = require('./energyAccount.model');
 const EnergyPurchaseModel = require('./energyPurchase.model');
 const ApplianceModel = require('./appliance.model');
 const ConsumptionLogModel = require('./consumptionLog.model');
+const EnergyBalanceModel = require('./energyBalance.model');
 
 const db = {};
 db.User = UserModel(sequelize, DataTypes);
@@ -15,6 +16,7 @@ db.EnergyAccount = EnergyAccountModel(sequelize, DataTypes);
 db.EnergyPurchase = EnergyPurchaseModel(sequelize, DataTypes);
 db.ConsumptionLog = ConsumptionLogModel(sequelize, DataTypes);
 db.Appliance = ApplianceModel(sequelize, DataTypes);
+db.EnergyBalance = EnergyBalanceModel(sequelize, DataTypes);
 
 // associations
 Object.keys(db).forEach(modelName => {
