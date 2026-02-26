@@ -50,7 +50,22 @@ module.exports = (sequelize, DataTypes) => {
       as: 'consumptionLogs'
     });
 
+    EnergyAccount.hasOne(models.EnergyBalance, {
+      foreignKey: 'energy_account_id',
+      as: 'energyBalance'
+    });
   };
+
+  EnergyAccount.afterCreate(async (energyAccount, options) => {
+    const { EnergyBalance } = sequelize.models;
+
+    await EnergyBalance.create({
+      energy_account_id: energyAccount.id,
+      lifetime_units_purchased: 0,
+      lifetime_units_consumed: 0,
+      current_units: 0
+    }, { transaction: options.transaction });
+  });
 
   return EnergyAccount;
 };
