@@ -20,9 +20,6 @@ const validate = require('../middlewares/validate.middleware');
  *           schema:
  *             type: object
  *             properties:
- *               account_type:
- *                 type: string
- *                 enum: [HOME, BUSINESS]
  *               meter_number:
  *                 type: string
  *     responses:
@@ -31,15 +28,16 @@ const validate = require('../middlewares/validate.middleware');
  */
 
 // Create a new energy account
-router.post('/', authMiddleware, [
-    body('account_type')
-    .isIn(['HOME', 'BUSINESS'])
-    .withMessage('Account type must be either HOME or BUSINESS'),
+router.post(
+  '/',
+  authMiddleware,
+  [
     body('meter_number')
       .notEmpty()
       .withMessage('Meter number is required'),
-],
-    validate,
-    energyAccountController.createEnergyAccount);
+  ],
+  validate,
+  energyAccountController.createEnergyAccount
+);
 
 module.exports = router;

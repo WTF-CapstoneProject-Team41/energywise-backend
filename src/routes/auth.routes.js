@@ -18,6 +18,10 @@ const validate = require("../middlewares/validate.middleware");
  *           schema:
  *             type: object
  *             properties:
+ *              first_name:
+ *                type: string
+ *              last_name:
+ *               type: string
  *               email:
  *                 type: string
  *               phone:
@@ -33,11 +37,24 @@ const validate = require("../middlewares/validate.middleware");
 router.post(
   "/signup",
   [
-    body("email").optional().isEmail().withMessage("Must be a valid email"),
+    body("first_name")
+      .notEmpty()
+      .withMessage("First name is required"),
+
+    body("last_name")
+      .notEmpty()
+      .withMessage("Last name is required"),
+
+    body("email")
+      .optional()
+      .isEmail()
+      .withMessage("Must be a valid email"),
+
     body("phone")
       .optional()
       .isString()
       .withMessage("Must be a valid phone number"),
+
     body("password")
       .notEmpty()
       .withMessage("Password is required")
@@ -45,7 +62,7 @@ router.post(
       .withMessage("Password must be at least 6 characters long"),
   ],
   validate,
-  authControllers.signup,
+  authControllers.signup
 );
 
 /**
@@ -99,5 +116,6 @@ router.post(
  *         description: Unauthorized
  */
 router.get('/me', authMiddleware, authControllers.me)
+
 
 module.exports = router;

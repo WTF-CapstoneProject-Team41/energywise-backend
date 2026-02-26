@@ -14,16 +14,18 @@ module.exports = (sequelize, DataTypes) => {
       unique: true
     },
 
-    account_type: {
-      type: DataTypes.ENUM('HOME','BUSINESS'),
-      allowNull: false
-    },
-
     meter_number: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+
+    base_tariff: {
+      type: DataTypes.DECIMAL(10, 4),
+      allowNull: true   // can be set later
     }
 
+  }, {
+    timestamps: true
   });
 
   EnergyAccount.associate = (models) => {
@@ -43,9 +45,9 @@ module.exports = (sequelize, DataTypes) => {
       as: 'appliances'
     });
 
-    EnergyAccount.hasMany(models.Recommendation, {
+    EnergyAccount.hasMany(models.ConsumptionLog, {
       foreignKey: 'energy_account_id',
-      as: 'recommendations'
+      as: 'consumptionLogs'
     });
 
   };

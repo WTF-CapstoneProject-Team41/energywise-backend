@@ -13,12 +13,35 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
 
-    name: DataTypes.STRING,
-    wattage: DataTypes.INTEGER,
-    quantity: DataTypes.INTEGER,
-    hours_per_day: DataTypes.DECIMAL(5,2),
-    days_per_week: DataTypes.INTEGER
+    appliance_type: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
 
+    wattage: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
+    },
+
+    hours_per_day: {
+      type: DataTypes.DECIMAL(5,2),
+      allowNull: false
+    },
+
+    duty_cycle: {
+      type: DataTypes.DECIMAL(3,2),  // e.g. 0.75
+      allowNull: false,
+      defaultValue: 1.0
+    }
+
+  }, {
+    timestamps: true
   });
 
   Appliance.associate = (models) => {

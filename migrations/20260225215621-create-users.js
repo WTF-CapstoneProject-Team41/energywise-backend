@@ -1,8 +1,10 @@
 'use strict';
 
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Users', {
+
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -12,14 +14,14 @@ module.exports = {
 
       email: {
         type: Sequelize.STRING,
-        unique: true,
-        allowNull: true
+        allowNull: false,
+        unique: true
       },
 
       phone: {
         type: Sequelize.STRING,
-        unique: true,
-        allowNull: true
+        allowNull: false,
+        unique: true
       },
 
       password_hash: {
@@ -29,35 +31,48 @@ module.exports = {
 
       google_id: {
         type: Sequelize.STRING,
-        unique: true,
+        allowNull: true,
+        unique: true
+      },
+
+      user_type: {
+        type: Sequelize.ENUM('HOME', 'SME'),
         allowNull: true
       },
 
       role: {
-        type: Sequelize.ENUM('USER','PROVIDER','ADMIN'),
+        type: Sequelize.ENUM('USER', 'ADMIN'),
+        allowNull: false,
         defaultValue: 'USER'
       },
 
       account_status: {
-        type: Sequelize.ENUM('ACTIVE','SUSPENDED','PENDING'),
+        type: Sequelize.ENUM('ACTIVE', 'SUSPENDED', 'PENDING'),
+        allowNull: false,
         defaultValue: 'ACTIVE'
+      },
+
+      last_login: {
+        type: Sequelize.DATE,
+        allowNull: true
       },
 
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
 
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
       }
+
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Users');
   }
 };
