@@ -13,11 +13,33 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
 
-    purchase_date: DataTypes.DATE,
-    amount_paid: DataTypes.DECIMAL(10,2),
-    units_kwh: DataTypes.DECIMAL(10,2),
-    source: DataTypes.STRING
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
 
+    units_purchased: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false
+    },
+
+    amount_paid: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true
+    },
+
+    source: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
+    token_id: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
+
+  }, {
+    timestamps: true
   });
 
   EnergyPurchase.associate = (models) => {

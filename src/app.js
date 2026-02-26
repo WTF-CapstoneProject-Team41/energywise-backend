@@ -5,6 +5,7 @@ const swaggerSpec = require('./config/swagger');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
 const energyAccountRoutes = require('./routes/energyAccount.routes');
 const energyPurchaseRoutes = require('./routes/energyPurchase.routes');
 
@@ -17,6 +18,7 @@ app.use(helmet());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/energy-account', energyAccountRoutes);
 app.use('/api/energy-purchases', energyPurchaseRoutes);
 

@@ -1,12 +1,15 @@
 'use strict';
 
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('EnergyAccounts', {
+
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
-        primaryKey: true
+        primaryKey: true,
+        allowNull: false
       },
 
       user_id: {
@@ -17,12 +20,8 @@ module.exports = {
           model: 'Users',
           key: 'id'
         },
+        onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
-      },
-
-      account_type: {
-        type: Sequelize.ENUM('HOME','BUSINESS'),
-        allowNull: false
       },
 
       meter_number: {
@@ -30,19 +29,27 @@ module.exports = {
         allowNull: false
       },
 
+      base_tariff: {
+        type: Sequelize.DECIMAL(10, 4),
+        allowNull: true
+      },
+
       createdAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
 
       updatedAt: {
         type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
       }
+
     });
   },
 
-  async down(queryInterface) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('EnergyAccounts');
   }
 };

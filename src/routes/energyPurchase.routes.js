@@ -34,18 +34,14 @@ const validate = require('../middlewares/validate.middleware');
  *         description: Energy purchase logged
  */
 router.post('/', authMiddleware, [
-    body('purchase_date')
+    body('units_purchased')
+      .isFloat({ gt: 0 })
+      .withMessage('Units must be greater than 0'),
+
+    body('source')
       .notEmpty()
-      .withMessage('Purchase date is required'),
-    body('amount_paid')
-      .notEmpty()
-      .withMessage('Amount paid is required')
-      .isFloat({ min: 0 })
-      .withMessage('Amount paid must be a positive number'),
-    body('units_kwh')
-    .isNumeric()
-    .withMessage('Units (kWh) must be a number'),
-],
-    energyPurchaseController.createEnergyPurchase);
+      .withMessage('Source is required')
+],validate,
+  energyPurchaseController.createManualPurchase);
 
 module.exports = router;
