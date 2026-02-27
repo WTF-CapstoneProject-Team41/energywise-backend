@@ -11,6 +11,7 @@ const energyPurchaseRoutes = require('./routes/energyPurchase.routes');
 const applianceRoutes = require('./routes/appliance.routes');
 const energySummaryRoutes = require('./routes/energySummary.routes');
 const energyDashboardRoutes = require('./routes/dashboard.routes');
+const forecastRoutes = require('./routes/forecast.routes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/energy-purchases', energyPurchaseRoutes);
 app.use('/api/appliances', applianceRoutes);
 app.use('/api/energy-summary', energySummaryRoutes);
 app.use('/api/dashboard', energyDashboardRoutes);
+app.use('/api/forecast', forecastRoutes);
 
 
 // const limiter = rateLimit({

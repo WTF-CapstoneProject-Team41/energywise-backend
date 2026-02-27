@@ -2,15 +2,16 @@ const {
   EnergyAccount,
   EnergyBalance,
   EnergyPurchase,
-  Appliance
+  Appliance,
+  User
 } = require('../models');
-
-const { runEnergyPipeline } = require('../services/ai.service');
 
 exports.getDashboard = async (req, res) => {
   try {
 
-    // Get account
+    // Get user + account
+    const user = await User.findByPk(req.user.id);
+
     const account = await EnergyAccount.findOne({
       where: { user_id: req.user.id }
     });
@@ -22,7 +23,7 @@ exports.getDashboard = async (req, res) => {
       });
     }
 
-    // Fetch DB state
+    // Fetch DB data
     const appliances = await Appliance.findAll({
       where: { energy_account_id: account.id }
     });
@@ -35,86 +36,107 @@ exports.getDashboard = async (req, res) => {
       where: { energy_account_id: account.id }
     });
 
-    // Build payload for AI
-    const payload = {
-      appliances: appliances.map(a => ({
-        account_id: a.energy_account_id,
-        wattage: a.wattage,
-        quantity: a.quantity,
-        hours_per_day: parseFloat(a.hours_per_day),
-        duty_cycle: parseFloat(a.duty_cycle)
-      })),
-      energy_purchase: purchases.map(p => ({
-        account_id: p.energy_account_id,
-        units_purchased: parseFloat(p.units_purchased),
-        date: p.date
-      })),
-      energy_balance: [{
-        account_id: balance.energy_account_id,
-        lifetime_units_purchased: parseFloat(balance.lifetime_units_purchased),
-        lifetime_units_consumed: parseFloat(balance.lifetime_units_consumed || 0),
-        current_units: parseFloat(balance.current_units)
-      }],
-      consumption_log: [],
-      energy_accounts: [{
-        account_id: account.id,
-        base_tariff: parseFloat(account.base_tariff || 1)
-      }]
-    };
+    if (!balance) {
+      return res.status(400).json({
+        success: false,
+        message: 'Energy balance not found'
+      });
+    }
 
-    // Call AI service
-    const aiResult = await runEnergyPipeline(payload);
+    // -----------------------------------------
+    // CALCULATIONS (FROM DATA SCIENCE LOGIC)
+    // -----------------------------------------
 
-    const updatedBalance = aiResult.energy_balance[0];
-    const logs = aiResult.consumption_log;
+    // Daily kWh calculation
+    let totalDailyKwh = 0;
 
-    // Compute dashboard metrics
+    appliances.forEach(appliance => {
+      const wattage = parseFloat(appliance.wattage);
+      const quantity = parseFloat(appliance.quantity);
+      const hours = parseFloat(appliance.hours_per_day);
+      const dutyCycle = parseFloat(appliance.duty_cycle);
 
-    const availableEnergy = updatedBalance.current_units;
-    const estimatedDuration = updatedBalance.days_remaining;
-    const depletionDate = updatedBalance.forecast_depletion_date;
+      const dailyKwh =
+        (wattage * quantity * hours * dutyCycle) / 1000;
 
-    // Daily average (last 30 days from AI logs)
-    const last30 = logs.slice(-30);
-    const dailyAverage =
-      last30.length > 0
-        ? last30.reduce((sum, l) => sum + parseFloat(l.estimated_kwh_used), 0) / last30.length
-        : 0;
+      totalDailyKwh += dailyKwh;
+    });
+    // Round daily kWh
+    totalDailyKwh = Number(totalDailyKwh.toFixed(2));
+
+    // Units per day
+    const baseTariff = parseFloat(account.base_tariff || 1);
+    let unitsPerDay =
+      baseTariff > 0 ? totalDailyKwh / baseTariff : 0;
+
+    unitsPerDay = Number(unitsPerDay.toFixed(2));
+
+    // Days remaining
+    const currentUnits = parseFloat(balance.current_units);
+    let daysRemaining =
+      unitsPerDay > 0 ? currentUnits / unitsPerDay : null;
+
+    daysRemaining = daysRemaining ? Number(daysRemaining.toFixed(2)) : null;
+
+    //  Forecast depletion date
+    let depletionDate = null;
+
+    if (daysRemaining && daysRemaining > 0) {
+      const today = new Date();
+      const forecastDate = new Date(
+        today.getTime() + daysRemaining * 24 * 60 * 60 * 1000
+      );
+      depletionDate = forecastDate.toISOString().slice(0, 10);
+    }
 
     // Last purchase
-    const lastPurchase =
-      purchases.length > 0
-        ? purchases.sort((a, b) => new Date(b.date) - new Date(a.date))[0]
-        : null;
+    let lastPurchase = null;
 
-    // Today's consumption
-    const today = new Date().toISOString().split('T')[0];
-    const todayLog = logs.find(l => l.date.startsWith(today));
+    if (purchases.length > 0) {
+      lastPurchase = purchases.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      )[0];
+    }
 
-    // Consumption trends (monthly total from logs)
+    // Today's consumption (estimated)
+    const todaysConsumption = unitsPerDay;
+
+    // Monthly consumption trend (basic deterministic projection)
     const monthlyTrend = {};
-    logs.forEach(log => {
-      const month = log.date.slice(0, 7);
-      monthlyTrend[month] =
-        (monthlyTrend[month] || 0) + parseFloat(log.estimated_kwh_used);
-    });
+
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    monthlyTrend[currentMonth] =
+  Number((totalDailyKwh * 30).toFixed(2));
+
+    // -----------------------------------------
+    // RESPONSE
+    // -----------------------------------------
 
     return res.status(200).json({
       success: true,
       data: {
-        name: req.user.name,
-        available_energy: availableEnergy,
-        estimated_duration_days: estimatedDuration,
+        name: user.name,
+
+        available_energy: currentUnits,
+
+        daily_average_kwh: totalDailyKwh,
+
+        units_per_day: unitsPerDay,
+
+        estimated_duration_days: daysRemaining,
+
         forecast_depletion_date: depletionDate,
-        daily_average_kwh: dailyAverage,
+
         last_purchase: lastPurchase,
-        todays_consumption_kwh: todayLog ? todayLog.estimated_kwh_used : 0,
+
+        todays_consumption_units: todaysConsumption,
+
         consumption_trends: monthlyTrend
       }
     });
 
   } catch (error) {
-    console.error("Dashboard error:", error.message);
+    console.error("Dashboard error:", error);
     return res.status(500).json({
       success: false,
       message: error.message
