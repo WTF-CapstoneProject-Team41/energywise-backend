@@ -7,9 +7,17 @@ const validate = require('../middlewares/validate.middleware');
 
 /**
  * @swagger
+ * tags:
+ *   name: EnergyAccount
+ *   description: Energy account management
+ */
+
+/**
+ * @swagger
  * /api/energy-account:
  *   post:
  *     summary: Create energy account
+ *     description: Creates an energy account for the authenticated user.
  *     tags: [EnergyAccount]
  *     security:
  *       - bearerAuth: []
@@ -19,12 +27,23 @@ const validate = require('../middlewares/validate.middleware');
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - meter_number
  *             properties:
  *               meter_number:
  *                 type: string
+ *                 example: "12345678901"
+ *               base_tariff:
+ *                 type: number
+ *                 format: float
+ *                 example: 0.75
  *     responses:
  *       201:
- *         description: Energy account created
+ *         description: Energy account created successfully
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
  */
 
 // Create a new energy account
