@@ -19,12 +19,12 @@ module.exports = (sequelize, DataTypes) => {
     },
 
     units_purchased: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.DECIMAL(12,4),
       allowNull: false
     },
 
     amount_paid: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.DECIMAL(12,4),
       allowNull: true
     },
 
@@ -48,6 +48,37 @@ module.exports = (sequelize, DataTypes) => {
       as: 'energyAccount'
     });
   };
+
+  EnergyPurchase.afterCreate(async (purchase, options) => {
+
+    const { EnergyBalance } = sequelize.models;
+
+    if (!options.transaction) {
+      throw new Error('Transaction required for EnergyPurchase');
+    }
+
+    const balance = await EnergyBalance.findOne({
+      where: { energy_account_id: purchase.energy_account_id },
+      transaction: options.transaction,
+      lock: options.transaction.LOCK.UPDATE
+    });
+
+    if (!balance) {
+      throw new Error('EnergyBalance not found for account');
+    }
+
+    const unitsPurchased = parseFloat(purchase.units_purchased);
+
+    balance.lifetime_units_purchased =
+      parseFloat(balance.lifetime_units_purchased) + unitsPurchased;
+
+    balance.current_units =
+      parseFloat(balance.current_units) + unitsPurchased;
+
+    balance.last_updated = new Date();
+
+    await balance.save({ transaction: options.transaction });
+  });
 
   return EnergyPurchase;
 };
