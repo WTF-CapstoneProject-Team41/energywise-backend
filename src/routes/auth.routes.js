@@ -120,6 +120,8 @@ router.post(
  *     responses:
  *       200:
  *         description: Login successful
+ *       401:
+ *         description: Invalid Google token
  */
 router.post("/google", authControllers.googleAuth);
 

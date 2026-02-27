@@ -10,6 +10,7 @@ const validate = require('../middlewares/validate.middleware');
  * /api/energy-purchases:
  *   post:
  *     summary: Log energy purchase
+ *     description: Logs a manual or payment-based energy purchase and automatically updates the energy balance.
  *     tags: [EnergyPurchase]
  *     security:
  *       - bearerAuth: []
@@ -19,19 +20,31 @@ const validate = require('../middlewares/validate.middleware');
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - units_purchased
+ *               - source
  *             properties:
- *               purchase_date:
- *                 type: string
- *                 format: date
+ *               units_purchased:
+ *                 type: number
+ *                 format: float
+ *                 example: 120.5
  *               amount_paid:
  *                 type: number
- *               units_kwh:
- *                 type: number
+ *                 format: float
+ *                 example: 5000
  *               source:
  *                 type: string
+ *                 example: MANUAL
+ *               token_id:
+ *                 type: string
+ *                 example: PSK-123456789
  *     responses:
  *       201:
- *         description: Energy purchase logged
+ *         description: Energy purchase logged and balance updated
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized
  */
 router.post('/', authMiddleware, [
     body('units_purchased')
