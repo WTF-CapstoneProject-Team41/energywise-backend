@@ -10,6 +10,7 @@ const energyAccountRoutes = require('./routes/energyAccount.routes');
 const energyPurchaseRoutes = require('./routes/energyPurchase.routes');
 const applianceRoutes = require('./routes/appliance.routes');
 const energySummaryRoutes = require('./routes/energySummary.routes');
+const energyDashboardRoutes = require('./routes/dashboard.routes');
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use('/api/energy-account', energyAccountRoutes);
 app.use('/api/energy-purchases', energyPurchaseRoutes);
 app.use('/api/appliances', applianceRoutes);
 app.use('/api/energy-summary', energySummaryRoutes);
+app.use('/api/dashboard', energyDashboardRoutes);
+
 
 // const limiter = rateLimit({
 //   windowMs: 15 * 60 * 1000,
