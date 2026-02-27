@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     energy_account_id: {
       type: DataTypes.UUID,
       allowNull: false,
-      unique: true // 🔥 one balance per account
+      unique: true // one balance per account
     },
 
     lifetime_units_purchased: {
