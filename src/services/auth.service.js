@@ -1,8 +1,11 @@
 const bcrypt = require('bcrypt');
+const {OAuth2Client} = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const { User, Profile, sequelize } = require('../models');
 const { Op } = require('sequelize');
 const config = require('../config/env');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 exports.signup = async (data) => {
     const {email, phone, password, first_name, last_name} = data;
@@ -107,3 +110,74 @@ exports.login = async (data) => {
         token
     };
 }
+
+exports.googleAuth = async (data) => {
+  const { idToken } = data;
+
+  if (!idToken) {
+    throw new Error("Google token is required");
+  }
+
+  //  Verify token with Google
+  const ticket = await client.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  if (!payload.email) {
+    throw new Error("Invalid Google account");
+  }
+
+  //  Check if user exists
+  let user = await User.findOne({
+    where: { email: payload.email }
+  });
+
+  const transaction = await sequelize.transaction();
+
+  try {
+
+    //  If user does NOT exist → create user + profile
+    if (!user) {
+
+      user = await User.create({
+        email: payload.email,
+        password_hash: null, // IMPORTANT
+        user_type: null,
+        account_status: "ACTIVE"
+      }, { transaction });
+
+      await Profile.create({
+        user_id: user.id,
+        first_name: payload.given_name || "",
+        last_name: payload.family_name || "",
+        phone: null
+      }, { transaction });
+
+    }
+
+    await transaction.commit();
+
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+
+  //  Update last login
+  user.last_login = new Date();
+  await user.save();
+
+  //  Generate JWT (same structure as signup/login)
+  const token = jwt.sign(
+    { id: user.id, role: user.role, user_type: user.user_type },
+    config.jwt.secret,
+    { expiresIn: config.jwt.expiresIn }
+  );
+
+  return {
+    message: "Google login successful",
+    token
+  };
+};

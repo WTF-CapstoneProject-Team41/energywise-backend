@@ -18,10 +18,10 @@ const validate = require("../middlewares/validate.middleware");
  *           schema:
  *             type: object
  *             properties:
- *              first_name:
- *                type: string
- *              last_name:
- *               type: string
+ *               first_name:
+ *                 type: string
+ *               last_name:
+ *                 type: string
  *               email:
  *                 type: string
  *               phone:
@@ -33,36 +33,36 @@ const validate = require("../middlewares/validate.middleware");
  *         description: Signup successful
  */
 
-
 router.post(
   "/signup",
   [
-    body("first_name")
-      .notEmpty()
-      .withMessage("First name is required"),
+    body("first_name").trim().notEmpty().withMessage("First name is required"),
 
-    body("last_name")
-      .notEmpty()
-      .withMessage("Last name is required"),
+    body("last_name").trim().notEmpty().withMessage("Last name is required"),
 
     body("email")
-      .optional()
+      .notEmpty()
+      .withMessage("Email is required")
       .isEmail()
       .withMessage("Must be a valid email"),
 
     body("phone")
       .optional()
-      .isString()
+      .isMobilePhone("any")
       .withMessage("Must be a valid phone number"),
 
     body("password")
       .notEmpty()
       .withMessage("Password is required")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters long"),
+      .isLength({ min: 8 })
+      .withMessage("Password must be at least 8 characters long")
+      .matches(/[A-Z]/)
+      .withMessage("Password must contain at least one uppercase letter")
+      .matches(/[0-9]/)
+      .withMessage("Password must contain at least one number"),
   ],
   validate,
-  authControllers.signup
+  authControllers.signup,
 );
 
 /**
@@ -93,6 +93,7 @@ router.post(
   "/login",
   [
     body("identifier")
+      .trim()
       .notEmpty()
       .withMessage("Email or phone number is required"),
     body("password").notEmpty().withMessage("Password is required"),
@@ -100,6 +101,27 @@ router.post(
   validate,
   authControllers.login,
 );
+
+/**
+ * @swagger
+ * /api/auth/google:
+ *   post:
+ *     summary: Google Sign-In
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ */
+router.post("/google", authControllers.googleAuth);
 
 /**
  * @swagger
@@ -115,7 +137,6 @@ router.post(
  *       401:
  *         description: Unauthorized
  */
-router.get('/me', authMiddleware, authControllers.me)
-
+router.get("/me", authMiddleware, authControllers.me);
 
 module.exports = router;
