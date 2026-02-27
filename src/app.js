@@ -13,6 +13,7 @@ const energySummaryRoutes = require('./routes/energySummary.routes');
 const energyDashboardRoutes = require('./routes/dashboard.routes');
 const forecastRoutes = require('./routes/forecast.routes');
 const recommendationRoutes = require('./routes/recommendation.routes');
+const paymentRoutes = require('./routes/payment.routes');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/energy-summary', energySummaryRoutes);
 app.use('/api/dashboard', energyDashboardRoutes);
 app.use('/api/forecast', forecastRoutes);
 app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/payments', paymentRoutes);
 
 
 
