@@ -57,8 +57,28 @@ const getCurrentUser = async (req, res) => {
   }
 }
 
+const googleAuth = async (req, res) => {
+  try {
+    const result = await authService.googleAuth(req.body);
+
+    return res.json({
+      success: true,
+      message: result.message,
+      data: { token: result.token }
+    });
+
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+
 module.exports = {
   signup,
   login,
-  me: getCurrentUser
+  me: getCurrentUser,
+  googleAuth
 };

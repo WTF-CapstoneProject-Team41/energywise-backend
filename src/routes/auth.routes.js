@@ -8,29 +8,29 @@ const validate = require("../middlewares/validate.middleware");
 /**
  * @swagger
  * /api/auth/signup:
-  post:
-    summary: Register new user
-    tags: [Auth]
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              first_name:
-                type: string
-              last_name:
-                type: string
-              email:
-                type: string
-              phone:
-                type: string
-              password:
-                type: string
-    responses:
-      201:
-        description: Signup successful
+ *   post:
+ *     summary: Register new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               first_name:
+ *                 type: string
+ *               last_name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Signup successful
  */
 
 router.post(
