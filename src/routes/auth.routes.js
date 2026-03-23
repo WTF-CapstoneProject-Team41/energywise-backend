@@ -130,14 +130,65 @@ router.post("/google", authControllers.googleAuth);
  * /api/auth/me:
  *   get:
  *     summary: Get current authenticated user
+ *     description: Returns the authenticated user's details along with onboarding status.
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Returns current user
+ *         description: Current user retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     email:
+ *                       type: string
+ *                       example: user@example.com
+ *                     phone:
+ *                       type: string
+ *                       example: "08012345678"
+ *                     role:
+ *                       type: string
+ *                       example: USER
+ *                     account_status:
+ *                       type: string
+ *                       example: ACTIVE
+ *                     user_type:
+ *                       type: string
+ *                       enum: [HOUSEHOLD, SME]
+ *                       example: HOUSEHOLD
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     onboarding:
+ *                       type: object
+ *                       properties:
+ *                         user_type_set:
+ *                           type: boolean
+ *                           example: true
+ *                         profile_completed:
+ *                           type: boolean
+ *                           example: true
+ *                         energy_account_created:
+ *                           type: boolean
+ *                           example: true
+ *                         is_onboarded:
+ *                           type: boolean
+ *                           example: true
  *       401:
  *         description: Unauthorized
+ *       404:
+ *         description: User not found
  */
 router.get("/me", authMiddleware, authControllers.me);
 

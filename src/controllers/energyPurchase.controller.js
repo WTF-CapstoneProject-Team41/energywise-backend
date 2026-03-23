@@ -49,3 +49,31 @@ exports.createManualPurchase = async (req, res) => {
     });
   }
 };
+
+exports.getPurchases = async (req, res) => {
+  try{
+    const account = await EnergyAccount.findOne({ where: { user_id: req.user.id } });
+
+    if (!account) {
+      return res.status(400).json({
+        success: false,
+        message: 'Energy account not found'
+      });
+    }
+
+    const purchases = await EnergyPurchase.findAll({
+      where: { energy_account_id: account.id },
+      order: [['createdAt', 'DESC']]
+    });
+
+    return res.json({
+      success: true,
+      data: purchases
+    });
+  }catch(error){
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+}

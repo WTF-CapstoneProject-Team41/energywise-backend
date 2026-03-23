@@ -57,4 +57,54 @@ router.post('/', authMiddleware, [
 ],validate,
   energyPurchaseController.createManualPurchase);
 
+/**
+ * @swagger
+ * /api/energy-purchases:
+ *   get:
+ *     summary: Get energy purchase history
+ *     description: Retrieves all energy purchases for the authenticated user.
+ *     tags: [EnergyPurchase]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Purchase history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       date:
+ *                         type: string
+ *                         format: date-time
+ *                       units_purchased:
+ *                         type: number
+ *                         example: 120.5
+ *                       amount_paid:
+ *                         type: number
+ *                         example: 5000
+ *                       source:
+ *                         type: string
+ *                         example: MANUAL
+ *                       token_id:
+ *                         type: string
+ *                         example: PSK-123456789
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Energy account not found
+ */
+router.get('/', authMiddleware, energyPurchaseController.getPurchases);
+
 module.exports = router;
