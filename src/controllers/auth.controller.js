@@ -1,5 +1,5 @@
 const authService = require('../services/auth.service');
-const {User} = require('../models');
+const {User, Profile, EnergyAccount} = require('../models');
 
 const signup = async (req, res) => {
   try {
@@ -36,7 +36,7 @@ const login = async (req, res) => {
 const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'email', 'phone', 'role', 'account_status', 'createdAt' ]
+      attributes: ['id', 'email', 'phone', 'role', 'account_status', 'createdAt', 'user_type' ]
     });
     if(!user) {
       return res.status(404).json({
@@ -45,9 +45,23 @@ const getCurrentUser = async (req, res) => {
       });
     }
 
+    const profile = await Profile.findOne({ where: { user_id: user.id } });
+
+    const energyAccount = await EnergyAccount.findOne({ where: { user_id: user.id } });
+
+    const onboarding = {
+      user_type_set: !!user.user_type,
+      profile_completed: !!profile,
+      energy_account_connected: !!energyAccount,
+      is_onboarded: !!user.user_type && !!profile && !!energyAccount
+    };
+
     return res.json({
       success: true,
-      data: user
+      data: {
+        ...user.toJSON(),
+        onboarding
+      }
     });
   } catch (error) {
     return res.status(500).json({
