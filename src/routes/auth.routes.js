@@ -170,6 +170,15 @@ router.post("/google", authControllers.googleAuth);
  *                     createdAt:
  *                       type: string
  *                       format: date-time
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                     first_name:
+ *                      type: string
+ *                      example: John    
+ *                     last_name:
+ *                      type: string
+ *                      example: Doe
  *                     onboarding:
  *                       type: object
  *                       properties:
