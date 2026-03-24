@@ -36,7 +36,7 @@ const login = async (req, res) => {
 const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'email', 'phone', 'role', 'account_status', 'createdAt', 'user_type' ]
+      attributes: ['id', 'email', 'phone', 'role', 'account_status', 'createdAt', 'user_type', 'updatedAt']
     });
     if(!user) {
       return res.status(404).json({
@@ -45,7 +45,10 @@ const getCurrentUser = async (req, res) => {
       });
     }
 
-    const profile = await Profile.findOne({ where: { user_id: user.id } });
+    const profile = await Profile.findOne({
+      where: { user_id: user.id },
+      attributes: ['first_name', 'last_name']
+    });
 
     const energyAccount = await EnergyAccount.findOne({ where: { user_id: user.id } });
 
@@ -60,6 +63,8 @@ const getCurrentUser = async (req, res) => {
       success: true,
       data: {
         ...user.toJSON(),
+        first_name: profile?.first_name || null,
+        last_name: profile?.last_name || null,
         onboarding
       }
     });
